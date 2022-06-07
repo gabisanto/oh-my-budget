@@ -23,7 +23,7 @@ const iconDictionary = {
     general: generalIcon,
     recreation: recreationIcon,
     health: healthIcon,
-    subscription: susIcon}
+    subscriptions: susIcon}
 
 const Expense = ({expense,setExpenseEdit,deleteExpense}) => {
     const {nameExp,amount,category,id,date}= expense

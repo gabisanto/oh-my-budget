@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import ExpensesList from './components/ExpensesList'
+import Filter from './components/Filter'
 import Header from './components/Header'
 import Modal from './components/Modal'
 import { generateId } from './helpers'
@@ -10,7 +11,7 @@ function App() {
   //We need budget to be available in several components so it's better to set it in the main App
 
   //we add the localStorage part so it will work with the useEffect below and have both the budget and the expenses saved in LS for refresh!
-  
+
   const [budget,setBudget] = useState(
     Number(localStorage.getItem('budget')) ?? 0
   )
@@ -23,7 +24,13 @@ function App() {
 
   const [modal,setModal] = useState(false)
 
-  const [modalAnimation,setModalAnimation] = useState(false) 
+  const [modalAnimation,setModalAnimation] = useState(false)
+  
+  //to filter we need the filter, and a state to save the results. we can NOT use the expenses state because if we overwrite it, we will lose all the info
+
+  const [filter, setFilter] = useState('')
+
+  const [filtered, setFiltered] = useState([])
 
   //we need to identify which expense to edit
   const [expenseEdit,setExpenseEdit] = useState({})
@@ -45,6 +52,15 @@ function App() {
   useEffect(() => {
     localStorage.setItem('expenses', JSON.stringify(expenses) ?? [])
   }, [expenses])
+
+  useEffect(() => {
+    if(filter) {
+      //filter expenses by category
+      const filterCategory = expenses.filter(expense => expense.category === filter)
+      setFiltered(filterCategory)
+
+    }
+  },[filter])
 
   useEffect(() => {
     const budgetLS = Number(localStorage.getItem('budget')) ?? 0
@@ -98,14 +114,22 @@ function App() {
         setBudget={setBudget}
         isValidBudget = {isValidBudget}
         setIsValidBudget = {setIsValidBudget}
+        setExpenses={setExpenses} //so we can reset the app
       />
       {isValidBudget ? (
         <>
         <main>
+            <Filter 
+              filter={filter}
+              setFilter={setFilter}
+            />
+
             <ExpensesList 
                 expenses={expenses}
                 setExpenseEdit={setExpenseEdit}
                 deleteExpense={deleteExpense}
+                filter={filter}
+                filtered={filtered}
             
             />
         </main>
