@@ -8,15 +8,22 @@ import NewBudgetIcon from './img/nuevo-gasto.svg'
 
 function App() {
   //We need budget to be available in several components so it's better to set it in the main App
-  const [budget,setBudget] = useState(0)
+
+  //we add the localStorage part so it will work with the useEffect below and have both the budget and the expenses saved in LS for refresh!
+  
+  const [budget,setBudget] = useState(
+    Number(localStorage.getItem('budget')) ?? 0
+  )
+
+  const [expenses,setExpenses] = useState(
+    localStorage.getItem('expenses') ? JSON.parse(localStorage.getItem('expenses')) : []
+  )
 
   const [isValidBudget,setIsValidBudget] = useState(false)
 
   const [modal,setModal] = useState(false)
 
   const [modalAnimation,setModalAnimation] = useState(false) 
-
-  const [expenses,setExpenses] = useState([])
 
   //we need to identify which expense to edit
   const [expenseEdit,setExpenseEdit] = useState({})
@@ -30,6 +37,22 @@ function App() {
     }, 300);
     }
   }, [expenseEdit])
+
+  useEffect(() => {
+    localStorage.setItem('budget', budget ?? 0)
+  }, [budget])
+
+  useEffect(() => {
+    localStorage.setItem('expenses', JSON.stringify(expenses) ?? [])
+  }, [expenses])
+
+  useEffect(() => {
+    const budgetLS = Number(localStorage.getItem('budget')) ?? 0
+    //if i dont add this next part, when i refresh i go back to the initial page. if i set valid budget i go straight to the expenses components page
+    if(budgetLS > 0) {
+      setIsValidBudget(true)
+    }
+  })
 
   const handleNewBudget = () => {
     setModal(true)
