@@ -1,20 +1,38 @@
-import { useState} from 'react'
+import { useState, useEffect} from 'react'
 import Message from './Message'
 import CloseModal from '../img/cerrar.svg'
 
 
-const Modal = ({setModal,modalAnimation,setModalAnimation,saveExpense}) => {
+const Modal = ({
+    setModal,
+    modalAnimation,
+    setModalAnimation,
+    saveExpense, 
+    expenseEdit,
+    setExpenseEdit}) => {
 
     const [msg,setMsg] = useState('')
     const [nameExp,setNameExp] = useState('')
     const [amount,setAmount] = useState(0)
     const [category,setCategory] = useState('')
+    const [date, setDate] = useState('')
+    const [id,setId] = useState('')
 
+    useEffect(() => {
+        if(Object.keys(expenseEdit).length > 0) {
+            setNameExp(expenseEdit.nameExp)
+            setAmount(expenseEdit.amount)
+            setCategory(expenseEdit.category)
+            setId(expenseEdit.id)
+            setDate(expenseEdit.date)
+          }
+
+    }, [])
 
     const hideModal = () => {
             
             setModalAnimation(false)
-
+            setExpenseEdit({}) //resets modal
             setTimeout(() => {
                 setModal(false)
             }, 300);
@@ -26,6 +44,8 @@ const Modal = ({setModal,modalAnimation,setModalAnimation,saveExpense}) => {
             setMsg('All fields are required')
             return
         } 
+
+        saveExpense({nameExp, amount, category,id,date})
     }
 
   return (
@@ -39,7 +59,7 @@ const Modal = ({setModal,modalAnimation,setModalAnimation,saveExpense}) => {
         <form 
             onSubmit={handleSubmit}
             className={`formulario ${modalAnimation ? "animar" : "cerrar"}`}>
-        <legend>New expense</legend>
+        <legend>{expenseEdit.nameExp ? "Edit expense" : "New expense"}</legend>
         {msg && <Message type="error">{msg}</Message>}
             <div className='campo'>
                 
@@ -52,7 +72,9 @@ const Modal = ({setModal,modalAnimation,setModalAnimation,saveExpense}) => {
                 
                 <label htmlFor="amount">Amount used</label>
                 <input id="amount" type="number" placeholder="Add the amount" value = {amount}
-                onChange={e => setAmount(e.target.value)} />
+                //without the Number method, when I add all expenses, they concatenate instead of adding
+                onChange={e => setAmount(Number(e.target.value))} />
+
             </div>
 
             <div className='campo'>
@@ -71,7 +93,7 @@ const Modal = ({setModal,modalAnimation,setModalAnimation,saveExpense}) => {
                 </select>
             </div>
 
-            <input type="submit" value="Add expense" />
+            <input type="submit" value={expenseEdit.nameExp ? "Save changes" : "Create expense"} />
             
         </form>
 

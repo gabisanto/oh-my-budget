@@ -1,9 +1,22 @@
-import React from 'react'
+import {useState, useEffect} from 'react'
 
-const BudgetControl = ({budget}) => {
+const BudgetControl = ({budget,expenses}) => {
+    //we need to know how much we spent and how much we have available to show it in the component
+    const [available,setAvailable] = useState(0)
+    const [spent,setSpent] = useState(0)
 
-    const formatBudget = (amount) => {
-        return amount.toLocaleString('en-US', {
+
+
+    useEffect(() => {
+        const totalSpent = expenses.reduce((total,expense) => expense.amount + total,0)
+        const totalAvailable = budget - totalSpent
+        setAvailable(totalAvailable)
+        setSpent(totalSpent)
+        
+    },[expenses])
+
+    const formatBudget = (n) => {
+        return n.toLocaleString('en-US', {
             style: 'currency',
             currency: 'USD'
         })
@@ -23,13 +36,13 @@ const BudgetControl = ({budget}) => {
             <p>
                 <span>
                     Available:{' '} 
-                </span>{formatBudget(0)}
+                </span>{formatBudget(available)}
             </p>
 
             <p>
                 <span>
-                    Used:{' '} 
-                </span>{formatBudget(0)}
+                    Spent:{' '} 
+                </span>{formatBudget(spent)}
             </p>
 
         </div>
